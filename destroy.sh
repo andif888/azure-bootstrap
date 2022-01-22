@@ -12,7 +12,7 @@ terraform init \
 -backend-config="resource_group_name=${azure_bootstrap_resource_group_name}" \
 -backend-config="storage_account_name=${azure_bootstrap_storage_account_name}" \
 -backend-config="container_name=${azure_bootstrap_storage_account_container_name}" \
--backend-config="key=plyg02_bootstrap.tfstate"
+-backend-config="key=_self.tfstate"
 terraform validate
 terraform plan -var-file $shared_vars_file -input=false -out=planfile -destroy
 terraform apply -auto-approve planfile
