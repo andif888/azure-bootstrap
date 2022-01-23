@@ -15,4 +15,4 @@ terraform init \
 -backend-config="key=_self.tfstate"
 terraform validate
 terraform plan -var-file $shared_vars_file -input=false -out=planfile
-# terraform apply -auto-approve planfile
+terraform apply -auto-approve planfile
