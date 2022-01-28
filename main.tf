@@ -14,10 +14,14 @@ resource "azurerm_storage_account" "storage" {
   access_tier              = "Hot"
   min_tls_version          = "TLS1_2"
   tags                     = var.azure_tags
+
+  depends_on = [azurerm_resource_group.storage]
 }
 
 resource "azurerm_storage_container" "storage" {
   storage_account_name  = azurerm_storage_account.storage.name
   name                  = var.azure_bootstrap_storage_account_container_name
   container_access_type = "private"
+
+  depends_on = [azurerm_storage_account.storage]
 }

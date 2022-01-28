@@ -11,6 +11,7 @@ The storage account is later used for saving terraform state files.
 Make sure you have an azure service principal account. To create one you can use to following command in the azure command line tool.
 Replace your-azure-subscription-id with your real Scription ID. Feel free to also adjust the value of the `--name` attribute.\
 Otherwise you can configure a service principal using the Azure Portal. Make sure it has `Contributor` role in your Azure subscription.
+If your service principal is later used in other repositories and needs to be able to assign **RBAC roles** to Azure resources then it needs the `Owner` role instead of `Contributor`.
 
 ```bash
 # Login
@@ -21,7 +22,7 @@ az ad sp create-for-rbac \
 --name="sp_plyg02" \
 --role="Contributor" \
 --scope="/subscriptions/your-azure-subscription-id" \
---sdk-auth \
+--years=2 \
 > az_client_credentials.json
 ```
 ### Step 1: Adjust variables
@@ -37,9 +38,9 @@ nano shared_vars.hcl
 
 Rename [env.sample](./env.sample) to `.env` and fill in your azure credentials.
 
-### Step 3: Comment out `backend` configuration in [provider.tf](./provider.tf) for the initial build
+### Step 3: Comment out `backend` definition configuration in [provider.tf](./provider.tf) for the initial build
 
-Change:
+Change in [provider.tf](./provider.tf) from:
 
 ```hcl
 terraform {
@@ -56,6 +57,8 @@ to:
 //   }
 // }
 ```
+
+This instructs terraform to store tfstate file locally. This is necessary because the storage account does not exist yet.
 
 ### Step 4: Run `build_initial.sh`
 
@@ -93,7 +96,7 @@ terraform {
 }
 ```
 
-Copy the `ARM_ACCESS_KEY` for the newly created storage account from Azure portal to your `.env` file.
+Goto **[Azure Portal](https://portal.azure.com)** and find your newly create storage account. Goto **Access keys** and klick **Show keys**. Copy the first key and enter it as value for  `ARM_ACCESS_KEY` in your `.env` file.
 
 run:
 
@@ -101,6 +104,8 @@ run:
 source .env
 ./build.sh
 ```
+
+The re-runs terraform and terraform will ask you if it should automatically migrate terraform state file. You can happily say **yes**.
 
 ### Step 6: Enter Azure credentials into Github
 
@@ -113,15 +118,24 @@ To destroy everything:
 
 ```bash
 source .env
-./destroy
+./destroy.sh
 ```
 
 This script errors at the end, because the storage account is deleted and terraform tries to access the state file. This is OK.
 
 When you start over again, make sure to delete the following ignored files and folders:
 
-- `.terraform/`
-- `terraform.lock.hcl`
-- `planfile`
-- `terraform.tfstate.backup`
-- `terraform.state`
+```bash
+rm -rf ./.terraform
+rm -f ./.terraform.lock.hcl
+rm -f ./errored.tfstate
+rm -f ./planfile
+rm -f ./terraform.tfstate.backup
+rm -f ./terraform.tfstate
+```
+
+if you would also like to delete the service principal, you can use:
+
+```bash
+az ad sp delete --id $ARM_CLIENT_ID
+```

@@ -17,3 +17,6 @@ credentials.auto.tfvars
 credentials.sh
 vault
 playground/
+az_sp_assign_group_read.sh
+az_sp_create_to_env.sh
+az_sp_delete_from_env.sh
