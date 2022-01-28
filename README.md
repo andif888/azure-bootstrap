@@ -112,6 +112,8 @@ The re-runs terraform and terraform will ask you if it should automatically migr
 Before pushing your repo changes to Github, make sure to enter your Azure credentials into the `Action secrets` in Github.
 Name the `Action secrets` exactly in correspondence to the entries in the `.env` file.
 
+![Github Actions Secrets](./images/gha-secrets.png)
+
 ## Destroy
 
 To destroy everything:
