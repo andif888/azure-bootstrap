@@ -25,3 +25,8 @@ resource "azurerm_storage_container" "storage" {
 
   depends_on = [azurerm_storage_account.storage]
 }
+
+output "storage_account_primary_access_key" {
+  value = azurerm_storage_account.storage.primary_access_key
+  sensitive = true
+}
